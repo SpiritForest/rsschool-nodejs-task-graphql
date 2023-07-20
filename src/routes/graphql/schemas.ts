@@ -32,8 +32,21 @@ export const gqlSchema = buildSchema(`
     id:           UUID
     isMale:       Boolean
     yearOfBirth:  Int
-    userId:       String
+    userId:       UUID
     memberType:   MemberType
+    memberTypeId: MemberTypeId
+  }
+  
+  input CreateProfileInput {
+    isMale:       Boolean
+    yearOfBirth:  Int
+    userId:       String
+    memberTypeId: MemberTypeId
+  }
+
+  input ChangeProfileInput {
+    isMale:       Boolean
+    yearOfBirth:  Int
     memberTypeId: MemberTypeId
   }
 
@@ -44,6 +57,17 @@ export const gqlSchema = buildSchema(`
     authorId: String
   }
 
+  input CreatePostInput {
+    title:   String
+    content: String
+    authorId: String
+  }
+
+  input ChangePostInput {
+    title:   String
+    content: String
+  }
+
   type User {
     id: UUID
     name: String
@@ -52,6 +76,16 @@ export const gqlSchema = buildSchema(`
     posts: [Post]
     userSubscribedTo: [User]
     subscribedToUser: [User]
+  }
+
+  input CreateUserInput {
+    name: String
+    balance: Float
+  }
+
+  input ChangeUserInput {
+    name: String
+    balance: Float
   }
 
   type MemberType {
@@ -70,5 +104,19 @@ export const gqlSchema = buildSchema(`
     post(id: UUID!): Post
     profiles: [Profile]
     profile(id: UUID!): Profile
+  }
+
+  type Mutation {
+    createProfile(dto: CreateProfileInput!): Profile
+    createPost(dto: CreatePostInput!): Post
+    createUser(dto: CreateUserInput!): User
+    deletePost(id: UUID!): Boolean
+    deleteProfile(id: UUID!): Boolean
+    deleteUser(id: UUID!): Boolean
+    changePost(id: UUID!, dto: ChangePostInput): Post
+    changeProfile(id: UUID!, dto: ChangeProfileInput): Profile
+    changeUser(id: UUID!, dto: ChangeUserInput): User    
+    subscribeTo(userId: UUID!, authorId: UUID!): User
+    unsubscribeFrom(userId: UUID!, authorId: UUID!): Boolean
   }
 `);
