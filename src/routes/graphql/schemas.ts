@@ -28,13 +28,6 @@ export const gqlSchema = buildSchema(`
     business
   }
 
-  type SubscribersOnAuthors {
-    subscriber:   User
-    subscriberId: UUID
-    author:       User
-    authorId:     UUID
-  }
-
   type Profile {
     id:           UUID
     isMale:       Boolean
