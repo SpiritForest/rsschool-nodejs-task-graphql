@@ -1,3 +1,6 @@
+import depthLimit from 'graphql-depth-limit';
+import { validate } from "graphql";
+import { parse } from 'graphql';
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { graphql } from 'graphql';
 
@@ -16,15 +19,26 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       },
     },
     async handler(req, repl) {
-      const result = await graphql({
-        schema: gqlSchema,
-        source: req.body.query,
-        rootValue: resolvers,
-        contextValue: { prisma: fastify.prisma },
-        variableValues: req.body.variables,
-      });
+      const quertyDepthLimit = 5;
+      const ast = parse(req.body.query);
+      const errors = validate(gqlSchema, ast, [depthLimit(quertyDepthLimit)]);
 
-      await repl.send(result);
+      if (errors.length) {
+        await repl.send({
+          errors
+        });
+      } else {
+        const result = await graphql({
+          schema: gqlSchema,
+          source: req.body.query,
+          rootValue: resolvers,
+          contextValue: { prisma: fastify.prisma },
+          variableValues: req.body.variables
+        });
+  
+        await repl.send(result);
+      }
+
     },
   });
 };
