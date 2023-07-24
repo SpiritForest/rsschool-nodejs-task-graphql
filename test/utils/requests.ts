@@ -1,11 +1,15 @@
 import { FastifyInstance } from 'fastify';
 import { Static } from '@sinclair/typebox';
-import { createGqlResponse, gqlResponse } from '../../src/routes/graphql/schemas.js';
+import {
+  createGqlResponseSchema,
+  gqlResponseSchema,
+} from '../../src/routes/graphql/schemas.js';
 import { genCreatePostDto, genCreateProfileDto, genCreateUserDto } from './fake.js';
 import { userSchema } from '../../src/routes/users/schemas.js';
 import { profileSchema } from '../../src/routes/profiles/schemas.js';
 import { postSchema } from '../../src/routes/posts/schemas.js';
 import { MemberTypeId, memberTypeSchema } from '../../src/routes/member-types/schemas.js';
+import { prismaStatsSchema } from '../../src/routes/stats/schemas.js';
 
 type UserBody = Static<typeof userSchema>;
 type ProfileBody = Static<typeof profileSchema>;
@@ -14,14 +18,14 @@ type MemberTypeBody = Static<typeof memberTypeSchema>;
 
 export async function gqlQuery(
   app: FastifyInstance,
-  dto: Static<(typeof createGqlResponse)['body']>,
+  dto: Static<(typeof createGqlResponseSchema)['body']>,
 ) {
   const res = await app.inject({
     url: `/graphql`,
     method: 'POST',
     body: dto,
   });
-  const body = (await res.json()) as Static<typeof gqlResponse>;
+  const body = (await res.json()) as Static<typeof gqlResponseSchema>;
   return { res, body };
 }
 
@@ -165,11 +169,11 @@ export async function subscribedToUser(app: FastifyInstance, userId: string) {
   return { res, body };
 }
 
-export async function getPrismaCallsCount(app: FastifyInstance) {
+export async function getPrismaStats(app: FastifyInstance) {
   const res = await app.inject({
-    url: '/stats/prisma-calls-count',
+    url: '/stats/prisma',
     method: 'GET',
   });
-  const body = (await res.json()) as { count: number };
+  const body = (await res.json()) as Static<typeof prismaStatsSchema>;
   return { res, body };
 }

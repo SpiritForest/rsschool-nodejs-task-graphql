@@ -1,4 +1,4 @@
-import { randomInt, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { test } from 'tap';
 import { build } from '../helper.js';
 import {
@@ -112,7 +112,6 @@ await test('gql-queries', async (t) => {
 
     const {
       body: { data, errors },
-      res,
     } = await gqlQuery(app, {
       query: `query ($nullUserId: UUID!, $userWithNullProfileId: UUID!, $profileId: UUID!, $postId: UUID!) {
         user(id: $nullUserId) {

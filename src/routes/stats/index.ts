@@ -1,11 +1,17 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
+import { prismaStatsSchema } from './schemas.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   fastify.route({
-    url: '/prisma-calls-count',
+    url: '/prisma',
     method: 'GET',
+    schema: {
+      response: {
+        200: prismaStatsSchema,
+      },
+    },
     async handler() {
-      return { count: fastify.prismaCallsCount };
+      return fastify.prismaStats;
     },
   });
 };

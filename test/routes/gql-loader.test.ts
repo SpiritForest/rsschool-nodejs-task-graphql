@@ -1,15 +1,10 @@
-import { randomInt, randomUUID } from 'node:crypto';
 import { test } from 'tap';
 import { build } from '../helper.js';
 import {
   createPost,
   createProfile,
   createUser,
-  getMemberTypes,
-  getPosts,
-  getPrismaCallsCount,
-  getProfiles,
-  getUsers,
+  getPrismaStats,
   gqlQuery,
   subscribeTo,
 } from '../utils/requests.js';
@@ -30,8 +25,8 @@ await test('gql-loader', async (t) => {
     await subscribeTo(app, user2.id, user1.id);
 
     const {
-      body: { count: beforeCount },
-    } = await getPrismaCallsCount(app);
+      body: { operationHistory: beforeHistory },
+    } = await getPrismaStats(app);
 
     const {
       body: { errors },
@@ -59,10 +54,21 @@ await test('gql-loader', async (t) => {
     });
 
     const {
-      body: { count: afterCount },
-    } = await getPrismaCallsCount(app);
+      body: { operationHistory: afterHistory },
+    } = await getPrismaStats(app);
 
     t.ok(!errors);
-    t.ok(afterCount - beforeCount <= 6);
+    t.ok(afterHistory.length - beforeHistory.length <= 6);
+
+    const history = afterHistory.slice(beforeHistory.length);
+    const foundPostCall = history.find(
+      ({ model, operation }) => model === 'Post' && operation === 'findMany',
+    );
+    const foundMemberTypeCall = history.find(
+      ({ model, operation }) => model === 'MemberType' && operation === 'findMany',
+    );
+
+    t.ok(foundPostCall);
+    t.ok(foundMemberTypeCall);
   });
 });

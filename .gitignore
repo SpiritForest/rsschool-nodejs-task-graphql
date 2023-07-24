@@ -46,6 +46,7 @@ jspm_packages
 .idea
 
 # vscode
+.vscode
 *code-workspace
 
 # clinic

@@ -1,4 +1,4 @@
-import { randomInt, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { test } from 'tap';
 import { build } from '../helper.js';
 import {
@@ -54,30 +54,6 @@ await test('gql-mutations', async (t) => {
     t.ok(foundCreatedPost);
     t.ok(foundCreatedUser);
     t.ok(foundCreatedProfile);
-  });
-
-  await t.test('Create profile => fail; invalid dto.', async (t) => {
-    const { body: user1 } = await createUser(app);
-
-    const {
-      body: { data, errors },
-    } = await gqlQuery(app, {
-      query: `mutation ($profileDto: CreateProfileInput!) {
-        createProfile(dto: $profileDto) {
-            id
-        }
-    }`,
-      variables: {
-        profileDto: {
-          ...genCreateProfileDto(user1.id, MemberTypeId.BUSINESS),
-          yearOfBirth: 123.321,
-        },
-      },
-    });
-
-    t.ok(errors.length === 1);
-    const message = errors[0].message as string;
-    t.ok(message.endsWith('cannot represent non-integer value: 123.321'));
   });
 
   await t.test('Create profile => fail; invalid dto.yearOfBirth.', async (t) => {
